@@ -18,7 +18,6 @@ app.use(express.json())
  * }
  */
 
-
 const notes = []
 
 /**
