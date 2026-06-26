@@ -20,4 +20,15 @@ authRoutes.post("/register",authController.registerUser);
 authRoutes.get("/me", authController.getCurrentUser);
 
 
+
+
+/**
+ * POST /api/auth/login
+ * @summary Login a user
+ * @tags Authentication
+ */
+authRoutes.post("/login", authController.loginUser);
+
+
+
 export default authRoutes;
