@@ -10,5 +10,4 @@ export const validateRegister = (req, res, next) => {
     req.body = {}
 
     next();
-
 }
