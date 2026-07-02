@@ -10,6 +10,7 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static('public')); // Serve static files from the 'public' directory
 
 
 // Routes
