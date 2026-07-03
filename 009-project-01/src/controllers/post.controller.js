@@ -253,7 +253,6 @@ export const likePost = async (req, res) => {
     })
 
 
-
     if (isAlreadyLiked) {
         await Like.findByIdAndDelete(isAlreadyLiked._id);
 
