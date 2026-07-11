@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .messages {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .message {
+            width: 50%;
+            padding: 1rem;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .input-area {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f1f1f1;
+        }
+
+        .input-area input {
+            width: 50%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 1rem;
+        }
+
+        .input-area button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="messages">
+    </div>
+
+    <div class="input-area">
+        <input
+            type="text"
+            id="message-input"
+            placeholder="Type a message..."
+        >
+        <button id="send-button">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const button = document.getElementById("send-button");
+        const input = document.getElementById("message-input");
+        const messagesContainer = document.querySelector(".messages");
+
+
+        function createMessageElement(message) {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            messageElement.textContent = message;
+            return messageElement;
+        }
+
+        button.addEventListener("click", () => {
+
+            const value = input.value;
+            if (!value.trim()) {
+                return;
+            }
+
+            socket.emit("sendMessage", value)
+            input.value = "";
+        })
+
+
+        socket.on("receiveMessage", (message)=>{
+            const newMessageElement = createMessageElement(message);
+            messagesContainer.appendChild(newMessageElement);
+        })
+
+
+
+
+    </script>
+</body>
+</html>

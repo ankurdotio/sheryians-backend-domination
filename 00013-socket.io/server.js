@@ -13,10 +13,8 @@ io.on("connection", (socket) => {
     console.log("a user connected");
 
 
-    socket.on("elon", () => {
-        console.log("Elon event received");
-
-        socket.broadcast.emit("musk")
+    socket.on("sendMessage", elon => {
+        socket.emit("receiveMessage", elon)
     })
 
     socket.on("disconnect", () => {
