@@ -1,12 +1,8 @@
 import { randomUUID } from "node:crypto";
 import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
-import {
-    buildAuthToken,
-    getPublicUser,
-    getUserByEmail,
-    saveUser,
-} from "../middlewares/auth.middleware.js";
+import { buildAuthToken } from "../utils/auth.util.js";
+import { createUser, getPublicUser, getUserByEmail } from "../dao/user.dao.js";
 import type {
     CreateUserInput,
     LoginRequestBody,
@@ -27,7 +23,7 @@ export const register = async (
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    if (getUserByEmail(normalizedEmail)) {
+    if (await getUserByEmail(normalizedEmail)) {
         return res.status(409).json({
             message: "User already exists",
         });
@@ -40,7 +36,7 @@ export const register = async (
         passwordHash: await bcrypt.hash(password, 10),
     };
 
-    const user = saveUser(userData);
+    const user = await createUser(userData);
 
     return res.status(201).json({
         message: "User registered successfully",
@@ -61,7 +57,7 @@ export const login = async (
         });
     }
 
-    const user = getUserByEmail(email.trim().toLowerCase());
+    const user = await getUserByEmail(email.trim().toLowerCase());
 
     if (!user) {
         return res.status(401).json({

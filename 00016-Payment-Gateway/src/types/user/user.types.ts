@@ -8,8 +8,6 @@ export type AuthenticatedUser = Omit<StoredUser, PublicUserFields>;
 export type CreateUserInput = Omit<StoredUser, "createdAt" | "updatedAt"> &
     Partial<Pick<StoredUser, "id">>;
 
-export type UserLookup = Map<StoredUser["email"], StoredUser>;
-
 export type TokenPayload = Pick<StoredUser, "email" | "name"> & {
     sub: StoredUser["id"];
 };
