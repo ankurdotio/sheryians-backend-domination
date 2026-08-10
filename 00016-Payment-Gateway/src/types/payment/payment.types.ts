@@ -1,6 +1,14 @@
+import type { PaymentSchema } from "../../models/payment.schema.js";
+
+
+
+export type PaymentInput = Omit<PaymentSchema, "createdAt" | "updatedAt" | "signature" | "paymentId" | "user"> & {
+    user: string;
+};
+
+export type PaymentData = PaymentSchema;
+
 export type CreateOrderRequestBody = {
-    amount?: number;
-    currency?: string;
     productId?: string;
 };
 

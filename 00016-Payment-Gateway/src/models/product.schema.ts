@@ -1,5 +1,5 @@
-import type { InferSchemaType } from "mongoose";
-import { Schema, model, models } from "mongoose";
+import type { InferSchemaType, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 
 export const productSchema = new Schema(
 	{
@@ -51,6 +51,8 @@ export const productSchema = new Schema(
 	}
 );
 
-export type ProductSchema = InferSchemaType<typeof productSchema>;
+export type ProductSchema = InferSchemaType<typeof productSchema> & {
+    _id: Types.ObjectId; // Include the _id field in the ProductSchema type
+};
 
-export const ProductModel = models.Product || model("Product", productSchema);
+export const ProductModel = model("Product", productSchema);

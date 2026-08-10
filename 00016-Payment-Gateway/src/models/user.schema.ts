@@ -1,5 +1,5 @@
 import type { InferSchemaType } from "mongoose";
-import { Schema, model, models } from "mongoose";
+import { Schema, model } from "mongoose";
 
 export const userSchema = new Schema(
     {
@@ -33,4 +33,4 @@ export const userSchema = new Schema(
 
 export type UserSchema = InferSchemaType<typeof userSchema>;
 
-export const UserModel = models.User || model("User", userSchema);
+export const UserModel =  model("User", userSchema);
