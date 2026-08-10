@@ -24,10 +24,6 @@ export const userSchema = new Schema(
             type: String,
             required: true,
         },
-        salt: {
-            type: String,
-            required: true,
-        },
     },
     {
         timestamps: true,

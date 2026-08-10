@@ -1,9 +1,8 @@
-import type { Request } from "express";
 import type { UserSchema } from "../../models/user/user.schema.js";
 
 export type StoredUser = UserSchema;
 
-export type PublicUserFields = "passwordHash" | "salt" | "createdAt" | "updatedAt";
+export type PublicUserFields = "passwordHash" | "createdAt" | "updatedAt";
 export type AuthenticatedUser = Omit<StoredUser, PublicUserFields>;
 
 export type CreateUserInput = Omit<StoredUser, "createdAt" | "updatedAt"> &
@@ -17,4 +16,13 @@ export type TokenPayload = Pick<StoredUser, "email" | "name"> & {
 
 export type UserPatch = Partial<Omit<StoredUser, "id" | "createdAt" | "updatedAt">>;
 
-export type AuthenticatedRequest = Request & { user: AuthenticatedUser };
+export type RegisterRequestBody = {
+    name?: string;
+    email?: string;
+    password?: string;
+};
+
+export type LoginRequestBody = {
+    email?: string;
+    password?: string;
+};

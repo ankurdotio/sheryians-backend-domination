@@ -1,7 +1,6 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import jwt from "jsonwebtoken";
 import type { NextFunction, Request, Response } from "express";
 import type {
-    AuthenticatedRequest,
     AuthenticatedUser,
     CreateUserInput,
     StoredUser,
@@ -11,13 +10,6 @@ import type {
 
 const users: UserLookup = new Map();
 const secret = process.env.AUTH_SECRET ?? "development-auth-secret";
-
-const encode = (value: string) => Buffer.from(value).toString("base64url");
-const decode = (value: string) => Buffer.from(value, "base64url").toString("utf8");
-
-const sign = (payload: string) => {
-    return createHmac("sha256", secret).update(payload).digest("base64url");
-};
 
 export const saveUser = (user: CreateUserInput) => {
     const now = new Date();
@@ -45,39 +37,38 @@ export const getPublicUser = (user: StoredUser): AuthenticatedUser => {
 };
 
 export const buildAuthToken = (user: StoredUser) => {
-    const payload = encode(
-        JSON.stringify({
+    return jwt.sign(
+        {
             sub: user.id,
             email: user.email,
             name: user.name,
-        } satisfies TokenPayload)
+        } satisfies TokenPayload,
+        secret,
+        {
+            expiresIn: "1d",
+        }
     );
-
-    const signature = sign(payload);
-    return `${payload}.${signature}`;
 };
 
 const verifyAuthToken = (token: string): TokenPayload | null => {
-    const [payload, signature] = token.split(".");
-
-    if (!payload || !signature) {
-        return null;
-    }
-
-    const expectedSignature = sign(payload);
-    const providedBuffer = Buffer.from(signature);
-    const expectedBuffer = Buffer.from(expectedSignature);
-
-    if (providedBuffer.length !== expectedBuffer.length) {
-        return null;
-    }
-
-    if (!timingSafeEqual(providedBuffer, expectedBuffer)) {
-        return null;
-    }
-
     try {
-        return JSON.parse(decode(payload)) as TokenPayload;
+        const decoded = jwt.verify(token, secret);
+
+        if (typeof decoded !== "object" || decoded === null) {
+            return null;
+        }
+
+        const { sub, email, name } = decoded;
+
+        if (typeof sub !== "string" || typeof email !== "string" || typeof name !== "string") {
+            return null;
+        }
+
+        return {
+            sub,
+            email,
+            name,
+        };
     } catch {
         return null;
     }
@@ -109,10 +100,14 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
         });
     }
 
-    (req as AuthenticatedRequest).user = getPublicUser(user);
+    req.user = getPublicUser(user);
     next();
 };
 
 export const getAuthenticatedUser = (req: Request) => {
-    return (req as AuthenticatedRequest).user;
+    if (!req.user) {
+        throw new Error("Authenticated user is not available on the request");
+    }
+
+    return req.user;
 };

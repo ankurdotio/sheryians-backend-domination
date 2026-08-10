@@ -1,4 +1,5 @@
-import { randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import {
     buildAuthToken,
@@ -6,18 +7,17 @@ import {
     getUserByEmail,
     saveUser,
 } from "../middlewares/auth.middleware.js";
-import type { CreateUserInput } from "../types/user/user.types.js";
+import type {
+    CreateUserInput,
+    LoginRequestBody,
+    RegisterRequestBody,
+} from "../types/user/user.types.js";
 
-const hashPassword = (password: string, salt: string) => {
-    return scryptSync(password, salt, 64).toString("hex");
-};
-
-export const register = (req: Request, res: Response) => {
-    const { name, email, password } = req.body as {
-        name?: string;
-        email?: string;
-        password?: string;
-    };
+export const register = async (
+    req: Request<Record<string, never>, unknown, RegisterRequestBody>,
+    res: Response
+) => {
+    const { name, email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({
@@ -33,13 +33,11 @@ export const register = (req: Request, res: Response) => {
         });
     }
 
-    const salt = randomUUID();
     const userData: CreateUserInput = {
         id: randomUUID(),
         name: name?.trim() || "Anonymous",
         email: normalizedEmail,
-        passwordHash: hashPassword(password, salt),
-        salt,
+        passwordHash: await bcrypt.hash(password, 10),
     };
 
     const user = saveUser(userData);
@@ -51,11 +49,11 @@ export const register = (req: Request, res: Response) => {
     });
 };
 
-export const login = (req: Request, res: Response) => {
-    const { email, password } = req.body as {
-        email?: string;
-        password?: string;
-    };
+export const login = async (
+    req: Request<Record<string, never>, unknown, LoginRequestBody>,
+    res: Response
+) => {
+    const { email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({
@@ -71,11 +69,7 @@ export const login = (req: Request, res: Response) => {
         });
     }
 
-    const incomingHash = hashPassword(password, user.salt);
-    const matches = timingSafeEqual(
-        Buffer.from(incomingHash, "hex"),
-        Buffer.from(user.passwordHash, "hex")
-    );
+    const matches = await bcrypt.compare(password, user.passwordHash);
 
     if (!matches) {
         return res.status(401).json({

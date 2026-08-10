@@ -1,15 +1,18 @@
 import type { Request, Response } from "express";
 import { getAuthenticatedUser } from "../middlewares/auth.middleware.js";
+import type {
+    CreateOrderRequestBody,
+    VerifyPaymentRequestBody,
+} from "../types/payment/payment.types.js";
 
 
 
-export const createOrder = (req: Request, res: Response) => {
+export const createOrder = (
+	req: Request<Record<string, never>, unknown, CreateOrderRequestBody>,
+    res: Response
+) => {
 	const user = getAuthenticatedUser(req);
-	const { amount, currency = "INR", receipt } = req.body as {
-		amount?: number;
-		currency?: string;
-		receipt?: string;
-	};
+	const { amount, currency = "INR", receipt } = req.body;
 
 	if (!amount || amount <= 0) {
 		return res.status(400).json({
@@ -31,13 +34,12 @@ export const createOrder = (req: Request, res: Response) => {
 };
 
 
-export const verifyPayment = (req: Request, res: Response) => {
+export const verifyPayment = (
+	req: Request<Record<string, never>, unknown, VerifyPaymentRequestBody>,
+    res: Response
+) => {
 	const user = getAuthenticatedUser(req);
-	const { orderId, paymentId, signature } = req.body as {
-		orderId?: string;
-		paymentId?: string;
-		signature?: string;
-	};
+	const { orderId, paymentId, signature } = req.body;
 
 	if (!orderId || !paymentId || !signature) {
 		return res.status(400).json({
