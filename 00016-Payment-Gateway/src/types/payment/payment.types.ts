@@ -1,7 +1,7 @@
 export type CreateOrderRequestBody = {
     amount?: number;
     currency?: string;
-    receipt?: string;
+    productId?: string;
 };
 
 export type VerifyPaymentRequestBody = {

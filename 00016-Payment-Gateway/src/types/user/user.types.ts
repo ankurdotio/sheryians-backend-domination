@@ -1,4 +1,4 @@
-import type { UserSchema } from "../../models/user/user.schema.js";
+import type { UserSchema } from "../../models/user.schema.js";
 
 export type StoredUser = UserSchema;
 
