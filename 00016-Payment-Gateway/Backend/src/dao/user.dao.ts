@@ -4,8 +4,10 @@ import type {
     CreateUserInput,
     StoredUser,
 } from "../types/user/user.types.js";
+import type { Types } from "mongoose";
 
 const toStoredUser = (user: {
+    _id: Types.ObjectId;
     id: string;
     name: string;
     email: string;
@@ -14,6 +16,7 @@ const toStoredUser = (user: {
     updatedAt: Date;
 }): StoredUser => {
     return {
+        _id: user._id,
         id: user.id,
         name: user.name,
         email: user.email,
@@ -35,7 +38,9 @@ export const createUser = async (user: CreateUserInput): Promise<StoredUser> => 
 };
 
 export const getUserByEmail = async (email: string): Promise<StoredUser | null> => {
-    const user = await UserModel.findOne().where("email").equals(email).lean();
+    const user = await UserModel.findOne({
+        email: email,
+    })
 
     if (!user) {
         return null;
@@ -45,8 +50,11 @@ export const getUserByEmail = async (email: string): Promise<StoredUser | null> 
 };
 
 export const getPublicUser = (user: StoredUser): AuthenticatedUser => {
+
+    console.log("user._id", user);
+
     return {
-        id: user.id,
+        id: `${user._id}`,
         name: user.name,
         email: user.email,
     };

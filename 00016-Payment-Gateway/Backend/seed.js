@@ -16,10 +16,10 @@
  * DB_NAME below to match your project.
  */
 
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 const MONGO_URI = 'mongodb://127.0.0.1:27017';
-const DB_NAME = 'payment_gateway_demo';
+const DB_NAME = 'payment-gateway';
 const COLLECTION = 'products';
 
 // Prices are in INR (rupees). Razorpay's Orders API expects the smallest

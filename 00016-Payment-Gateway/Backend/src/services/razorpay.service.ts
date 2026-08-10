@@ -1,5 +1,6 @@
 import Razorpay from "razorpay";
 import config from "../config/config.js";
+import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js"
 
 
 const razorpayInstance = new Razorpay({
@@ -29,4 +30,14 @@ export async function createRazorpayOrder(amount: number, currency: string): Pro
         amount: `${order.amount}`,
         currency: order.currency,
     };
+}
+
+export async function verifyRazorpayPayment(orderId: string, paymentId: string, signature: string): Promise<boolean> {
+
+    const isValid = await validatePaymentVerification({
+        order_id: orderId,
+        payment_id: paymentId
+    }, signature, config.RAZORPAY_API_KEY_SECRET);
+
+    return isValid;
 }

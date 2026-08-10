@@ -3,7 +3,7 @@ import type { UserSchema } from "../../models/user.schema.js";
 export type StoredUser = UserSchema;
 
 export type PublicUserFields = "passwordHash" | "createdAt" | "updatedAt";
-export type AuthenticatedUser = Omit<StoredUser, PublicUserFields>;
+export type AuthenticatedUser = Omit<StoredUser, PublicUserFields | "_id"> ;
 
 export type CreateUserInput = Omit<StoredUser, "createdAt" | "updatedAt"> &
     Partial<Pick<StoredUser, "id">>;
