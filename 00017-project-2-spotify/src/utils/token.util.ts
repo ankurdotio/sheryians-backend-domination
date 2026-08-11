@@ -17,7 +17,12 @@ export interface TokenPair {
  * Creates an access token for the given payload.
  */
 export function createAccessToken(payload: AuthPayload): string {
-  return jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {
+  return jwt.sign({
+    id: payload.id,
+    email: payload.email,
+    name: payload.name,
+    userType: payload.userType ?? "user",
+  }, env.ACCESS_TOKEN_SECRET, {
     expiresIn: env.ACCESS_TOKEN_EXPIRY as jwt.SignOptions["expiresIn"],
   });
 }

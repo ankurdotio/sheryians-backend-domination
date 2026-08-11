@@ -12,6 +12,11 @@ export const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     passwordHash: { type: String, required: true },
     refreshTokenHash: { type: String, default: null },
+    userType:{
+      type: String,
+      enum: ["user", "artist"],
+      default: "user",
+    }
   },
   { timestamps: true },
 );

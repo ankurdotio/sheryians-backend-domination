@@ -224,6 +224,9 @@ export async function logoutHandler(req: Request, res: Response, next: NextFunct
 export async function meHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const user = req.user;
+
+  
+    
     if (!user) {
       throw new HttpError(401, "Unauthorized.");
     }

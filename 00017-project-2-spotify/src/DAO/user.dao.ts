@@ -13,6 +13,7 @@ function toUserDocument(user: UserDocumentType): UserDocument {
     refreshTokenHash: user.refreshTokenHash ?? null,
     createdAt: user.createdAt as Date,
     updatedAt: user.updatedAt as Date,
+    userType: user.userType as "user" | "artist"
   };
 }
 
