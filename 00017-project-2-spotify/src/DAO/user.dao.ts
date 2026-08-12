@@ -36,11 +36,12 @@ export async function findUserById(id: string): Promise<UserDocument | null> {
 /**
  * Creates a new user document.
  */
-export async function createUser(input: { name: string; email: string; passwordHash: string }): Promise<UserDocument> {
+export async function createUser(input: { name: string; email: string; passwordHash: string; userType: "user" | "artist" }): Promise<UserDocument> {
   const created = await User.create({
     name: input.name,
     email: input.email,
     passwordHash: input.passwordHash,
+    userType: input.userType,
   });
 
   return toUserDocument(created.toObject() as UserDocumentType);

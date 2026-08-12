@@ -17,6 +17,7 @@ export interface AppEnv {
   ACCESS_TOKEN_EXPIRY: string;
   REFRESH_TOKEN_EXPIRY: string;
   NODE_ENV: "development" | "production" | "test";
+  IMAGEKIT_PRIVATE_KEY: string;
 }
 
 function getRequiredEnv(key: keyof AppEnv): string {
@@ -47,4 +48,5 @@ export const env: AppEnv = {
   ACCESS_TOKEN_EXPIRY: getRequiredEnv("ACCESS_TOKEN_EXPIRY"),
   REFRESH_TOKEN_EXPIRY: getRequiredEnv("REFRESH_TOKEN_EXPIRY"),
   NODE_ENV: parseNodeEnv(getRequiredEnv("NODE_ENV")),
+  IMAGEKIT_PRIVATE_KEY: getRequiredEnv("IMAGEKIT_PRIVATE_KEY"),
 };

@@ -32,3 +32,19 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     res.status(401).json({ message: "Unauthorized." });
   }
 }
+
+export function protectedToArtistMiddleware(req: Request, res: Response, next: NextFunction): void {
+
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  if (req.user.userType !== "artist") {
+    res.status(403).json({ message: "Forbidden. Only artists can access this resource." });
+    return;
+  }
+
+  next();
+  
+}

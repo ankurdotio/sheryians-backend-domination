@@ -22,6 +22,7 @@ function validateRegisterBody(body: unknown): RegisterUserRequest {
   const name = candidate.name;
   const email = candidate.email;
   const password = candidate.password;
+  const userType = candidate.userType;
 
   if (!isNonEmptyString(name)) {
     throw new HttpError(400, "Name is required.");
@@ -39,7 +40,11 @@ function validateRegisterBody(body: unknown): RegisterUserRequest {
     throw new HttpError(400, "Password must be at least 8 characters long.");
   }
 
-  return { name: name.trim(), email: email.trim().toLowerCase(), password };
+  if (userType !== undefined && userType !== "user" && userType !== "artist") {
+    throw new HttpError(400, "User type must be either 'user' or 'artist' if provided.");
+  }
+
+  return { name: name.trim(), email: email.trim().toLowerCase(), password, userType: userType ?? "user" };
 }
 
 function validateLoginBody(body: unknown): LoginUserRequest {
@@ -66,13 +71,14 @@ function validateLoginBody(body: unknown): LoginUserRequest {
   return { email: email.trim().toLowerCase(), password };
 }
 
-function toUserInfo(user: { id: string; name: string; email: string; createdAt: Date; updatedAt: Date }): UserInfo {
+function toUserInfo(user: { id: string; name: string; email: string; createdAt: Date; updatedAt: Date; userType: "user" | "artist" }): UserInfo {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    userType: user.userType
   };
 }
 
@@ -99,10 +105,10 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
     }
 
     const passwordHash = await bcrypt.hash(data.password, 10);
-    const user = await createUser({ name: data.name, email: data.email, passwordHash });
+    const user = await createUser({ name: data.name, email: data.email, passwordHash, userType: data.userType ?? "user" });
 
-    const accessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name });
-    const refreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name });
+    const accessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
+    const refreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
     const refreshHash = await bcrypt.hash(refreshToken, 10);
 
     await setRefreshTokenHash(user._id.toString(), refreshHash);
@@ -112,7 +118,7 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
     res.cookie("refreshToken", refreshToken, getRefreshCookieOptions());
     res.json({
       message: "User registered successfully.",
-      user: toUserInfo({ id: user._id.toString(), name: user.name, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt }),
+      user: toUserInfo({ id: user._id.toString(), name: user.name, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt, userType: user.userType }),
       accessToken,
       refreshToken,
     });
@@ -138,8 +144,8 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
       throw new HttpError(401, "Invalid email or password.");
     }
 
-    const accessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name });
-    const refreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name });
+    const accessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
+    const refreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
     const refreshHash = await bcrypt.hash(refreshToken, 10);
 
     await setRefreshTokenHash(user._id.toString(), refreshHash);
@@ -148,7 +154,7 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     res.cookie("refreshToken", refreshToken, getRefreshCookieOptions());
     res.json({
       message: "Logged in successfully.",
-      user: toUserInfo({ id: user._id.toString(), name: user.name, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt }),
+      user: toUserInfo({ id: user._id.toString(), name: user.name, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt, userType: user.userType }),
       accessToken,
       refreshToken,
     });
@@ -178,8 +184,8 @@ export async function refreshHandler(req: Request, res: Response, next: NextFunc
       throw new HttpError(401, "Refresh token invalid.");
     }
 
-    const newAccessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name });
-    const newRefreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name });
+    const newAccessToken = createAccessToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
+    const newRefreshToken = createRefreshToken({ id: user._id.toString(), email: user.email, name: user.name, userType: user.userType });
     const newRefreshHash = await bcrypt.hash(newRefreshToken, 10);
 
     await setRefreshTokenHash(user._id.toString(), newRefreshHash);
@@ -225,8 +231,8 @@ export async function meHandler(req: Request, res: Response, next: NextFunction)
   try {
     const user = req.user;
 
-  
-    
+
+
     if (!user) {
       throw new HttpError(401, "Unauthorized.");
     }
@@ -236,7 +242,7 @@ export async function meHandler(req: Request, res: Response, next: NextFunction)
       throw new HttpError(401, "Unauthorized.");
     }
 
-    res.json({ user: toUserInfo({ id: profile._id.toString(), name: profile.name, email: profile.email, createdAt: profile.createdAt, updatedAt: profile.updatedAt }) });
+    res.json({ user: toUserInfo({ id: profile._id.toString(), name: profile.name, email: profile.email, createdAt: profile.createdAt, updatedAt: profile.updatedAt, userType: profile.userType }) });
   } catch (error) {
     next(error);
   }

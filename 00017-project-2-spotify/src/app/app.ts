@@ -5,6 +5,7 @@ import express, { type Express } from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { registerAuthRoutes } from "../routes/auth.routes.js";
+import { registerSongsRoutes } from "../routes/songs.routes.js";
 import { errorMiddleware } from "../middlewares/error.middleware.js";
 
 /**
@@ -23,6 +24,7 @@ export function createApp(): Express {
   });
 
   app.use("/api/auth", registerAuthRoutes());
+  app.use("/api/songs", registerSongsRoutes());
   app.use(errorMiddleware);
 
   return app;

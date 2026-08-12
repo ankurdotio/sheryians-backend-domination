@@ -17,6 +17,7 @@ export interface UserInfo {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  userType: "user" | "artist";
 }
 
 /**
@@ -26,6 +27,7 @@ export interface RegisterUserRequest {
   name: string;
   email: string;
   password: string;
+  userType?: "user" | "artist";
 }
 
 /**
