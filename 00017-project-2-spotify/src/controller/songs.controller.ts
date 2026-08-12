@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import { uploadFile } from "../services/storage.service.js"
 import { createAlbum, getAlbumByIdAndArtistId } from "../DAO/album.dao.js"
-import { createSong } from "../DAO/song.dao.js"
+import { addSongToPlaylist, createPlaylist, getPlaylistById, getPlaylistsByUserId, getPlaylistByIdAndUserId } from "../DAO/playlist.dao.js"
+import { createSong, getSampleSongs, getSongById } from "../DAO/song.dao.js"
 import id3 from "node-id3";
 
 
+
+/**
+ * Controller to handle the upload of a song file. It reads the ID3 tags from the uploaded file, uploads the song and its poster to storage, and creates a new song document in the database.
+ */
 export const uploadSongController = async (req: Request, res: Response) => {
 
 
@@ -46,6 +51,23 @@ export const uploadSongController = async (req: Request, res: Response) => {
 
 }
 
+
+/**
+ * Controller to get 20 sample songs from the database.
+ */
+export const getSampleSongsController = async (req: Request, res: Response) => {
+    const songs = await getSampleSongs();
+
+    res.status(200).json({
+        message: "Sample songs retrieved successfully.", data: {
+            songs
+        }
+    });
+}
+
+/**
+ * Controller to handle the creation of a new album. It uploads the album poster to storage and creates a new album document in the database.
+ */
 export const createAlbumController = async (req: Request, res: Response) => {
 
     const poster = req.file;
@@ -75,4 +97,66 @@ export const createAlbumController = async (req: Request, res: Response) => {
         }
     });
 
+}
+
+
+/**
+ * Controller to handle the creation of new playlist. It creates a new playlist document in the database.
+ */
+export const createPlaylistController = async (req: Request, res: Response) => {
+
+    const { title } = req.body;
+
+    if (!title || typeof title !== "string" || title.trim() === "") {
+        return res.status(400).json({ message: "Title is required and must be a non-empty string." });
+    }
+
+    const playlist = await createPlaylist({
+        title: title.trim(),
+        user: req.user!.id,
+        songs: []
+    })
+
+    return res.status(201).json({
+        message: "Playlist created successfully.",
+        data: {
+            playlist
+        }
+    });
+
+}
+
+/**
+ * Controller to add a song to a playlist.
+ */
+export const addSongToPlaylistController = async (req: Request, res: Response) => {
+
+    const { playlistId, songId } = req.params;
+    const user = req.user
+
+    if (!playlistId || !songId) {
+        return res.status(400).json({ message: "Playlist ID and Song ID are required." });
+    }
+
+    const playlist = await getPlaylistByIdAndUserId(typeof playlistId === "string" ? playlistId : playlistId[0], user!.id);
+
+    if (!playlist) {
+        return res.status(404).json({ message: "Playlist not found or you do not have permission to modify this playlist." });
+    }
+
+    const song = await getSongById(typeof songId === "string" ? songId : songId[0]);
+
+    if (!song) {
+        return res.status(404).json({ message: "Song not found." });
+    }
+
+    await addSongToPlaylist(playlist._id.toString(), song._id.toString());
+
+    return res.status(200).json({
+        message: "Song added to playlist successfully.",
+        data: {
+            playlistId: playlist._id,
+            songId: song._id
+        }
+    });
 }
