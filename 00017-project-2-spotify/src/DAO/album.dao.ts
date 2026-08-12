@@ -15,3 +15,14 @@ export async function createAlbum(input: CreateAlbumRequest): Promise<AlbumDocum
 
     return album
 }
+
+
+/**
+ * Retrieves an album document by its ID and the associated artist's ID.
+ */
+export async function getAlbumByIdAndArtistId(albumId: string, artistId: string): Promise<AlbumDocument | null> {
+
+    const album = await Album.findOne({ _id: albumId, user: artistId });
+
+    return album
+}

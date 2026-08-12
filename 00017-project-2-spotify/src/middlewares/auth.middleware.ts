@@ -19,10 +19,12 @@ declare global {
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const header = req.get("authorization");
   if (!header || !header.startsWith("Bearer ")) {
+
+    
     res.status(401).json({ message: "Unauthorized." });
     return;
   }
-
+  
   const token = header.slice(7);
   try {
     const payload = verifyAccessToken(token);
