@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 import MediaCard from '../../../shared/components/MediaCard.jsx'
 import { playTrack } from '../../player/state/playerSlice.js'
 
-function RecentlyPlayed({ items }) {
+function Songs({ items }) {
   const dispatch = useDispatch()
 
   return (
@@ -26,4 +26,4 @@ function RecentlyPlayed({ items }) {
   )
 }
 
-export default RecentlyPlayed
+export default Songs

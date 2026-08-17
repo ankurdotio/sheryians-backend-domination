@@ -1,5 +1,5 @@
 import Albums from '../components/Albums.jsx'
-import RecentlyPlayed from '../components/RecentlyPlayed.jsx'
+import Songs from '../components/Songs.jsx'
 import { useHomeData } from '../hooks/useHomeData.js'
 
 function HomePage() {
@@ -15,7 +15,7 @@ function HomePage() {
 
     return (
         <div className="space-y-8 pb-8">
-            <RecentlyPlayed items={homeData.recentlyPlayed} />
+            <Songs items={homeData.songs} />
             <Albums items={homeData.albums} />
         </div>
     )

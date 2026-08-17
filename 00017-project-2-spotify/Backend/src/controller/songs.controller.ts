@@ -56,7 +56,10 @@ export const uploadSongController = async (req: Request, res: Response) => {
  * Controller to get 20 sample songs from the database.
  */
 export const getSampleSongsController = async (req: Request, res: Response) => {
-    const songs = await getSampleSongs();
+
+    const numberOfSongs = req.query.n ?? 20;
+    
+    const songs = await getSampleSongs(Number(numberOfSongs));
 
     res.status(200).json({
         message: "Sample songs retrieved successfully.", data: {

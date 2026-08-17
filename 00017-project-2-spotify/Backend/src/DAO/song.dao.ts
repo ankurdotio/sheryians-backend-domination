@@ -22,14 +22,51 @@ export async function createSong(input: CreateSongRequest): Promise<SongDocument
 
 
 /**
- * Retrieves 20 sample song documents.
+ * Retrieves 20 sample song documents.(max 20)
+ * @param n - The number of sample songs to retrieve (default is 20).
+ * @returns An array of sample song documents.
  */
-export async function getSampleSongs(): Promise<SongDocument[]> {
+export async function getSampleSongs(n: number = 20): Promise<SongDocument[]> {
+
+    const numberOfSongs = n > 20 ? 20 : n;
+
 
     const songs = await Song.aggregate([
         {
             '$sample': {
-                'size': 20
+                'size': numberOfSongs
+            },
+        },
+        {
+            "$lookup": {
+                "from": "users",
+                "localField": "artist",
+                "foreignField": "_id",
+                "as": "artist"
+            }
+        },
+        {
+            "$unwind": "$artist"
+        },
+        {
+            "$lookup": {
+                "from": "albums",
+                "localField": "album",
+                "foreignField": "_id",
+                "as": "album"
+            }
+        },
+        {
+            "$unwind": "$album"
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "title": 1,
+                "url": 1,
+                "poster": 1,
+                "artist": "$artist.name",
+                "album": "$album.title"
             }
         }
     ])

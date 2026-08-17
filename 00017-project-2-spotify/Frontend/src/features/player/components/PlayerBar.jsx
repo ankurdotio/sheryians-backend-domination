@@ -1,6 +1,7 @@
 import Icon from '../../../shared/components/Icon.jsx'
 import ProgressBar from './ProgressBar.jsx'
 import VolumeControl from './VolumeControl.jsx'
+import { useRef } from 'react'
 
 function PlayerBar({
   currentTrack,
@@ -13,11 +14,42 @@ function PlayerBar({
   progress,
   volume,
 }) {
+
+  const audioRef = useRef(null)
+
+  const handleProgressChange = (nextProgress) => {
+    const audio = audioRef.current
+
+    if (audio && Number.isFinite(audio.duration)) {
+      audio.currentTime = (nextProgress / 100) * audio.duration
+    }
+
+    onProgressChange(nextProgress)
+  }
+  
   return (
     <footer className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-zinc-950/90 px-4 py-2 backdrop-blur-2xl sm:px-6 lg:px-8">
+
+      <audio
+        src={currentTrack.url}
+        autoPlay={isPlaying}
+        onEnded={onNext}
+        hidden
+        ref={audioRef}
+        onTimeUpdate={()=>{
+          onProgressChange(Math.round((audioRef.current.currentTime / audioRef.current.duration) * 100))
+        }}
+       
+      />
+      
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2 md:flex-row md:items-center md:gap-6">
         <div className="flex min-w-0 items-center gap-3 md:w-1/4">
-          <div className={`size-12 shrink-0 rounded-2xl bg-gradient-to-br ${currentTrack.coverClass} shadow-lg shadow-black/30`} />
+          <div
+            style={{
+              backgroundImage: `url("${currentTrack.poster}")`,
+              backgroundSize: "cover"
+            }}
+            className={`size-12 shrink-0 rounded-2xl  shadow-lg shadow-black/30`} />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">{currentTrack.title}</p>
             <p className="truncate text-xs text-white/50">{currentTrack.artist}</p>
@@ -37,7 +69,14 @@ function PlayerBar({
             </button>
             <button
               className="grid size-10 place-items-center rounded-full bg-white text-zinc-950 shadow-lg shadow-emerald-500/20 transition hover:scale-105 hover:bg-emerald-400"
-              onClick={onTogglePlay}
+              onClick={(e)=>{
+                onTogglePlay(e)
+                if(isPlaying){
+                  audioRef.current.pause()
+                }else{
+                  audioRef.current.play()
+                }
+              }}
               type="button"
             >
               <Icon className="size-5" name={isPlaying ? 'pause' : 'play'} />
@@ -51,7 +90,7 @@ function PlayerBar({
           </div>
 
           <div className="w-full max-w-3xl px-4">
-            <ProgressBar onChange={onProgressChange} progress={progress} />
+            <ProgressBar onChange={handleProgressChange} progress={progress} />
           </div>
         </div>
 
