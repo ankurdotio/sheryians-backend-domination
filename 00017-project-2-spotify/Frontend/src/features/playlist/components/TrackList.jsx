@@ -4,7 +4,7 @@ import { formatDuration, formatNumber } from '../../../shared/utils/format.js'
 import { playTrack } from '../../player/state/playerSlice.js'
 import AddToPlaylistMenu from '../../library/components/AddToPlaylistMenu.jsx'
 
-function TrackList({ tracks, album }) {
+function TrackList({ tracks, album = {} }) {
   const dispatch = useDispatch()
 
   return (
@@ -35,15 +35,15 @@ function TrackList({ tracks, album }) {
           >
             <div className="flex items-center text-white/40">{track.trackNumber}</div>
             <div className="flex min-w-0 items-center gap-3">
-              <div 
-              style={{
-                backgroundImage: `url("${track.poster}")`,
-                backgroundSize: "cover"
-              }}
-              className={`size-11 shrink-0 rounded-xl`} />
+              <div
+                style={{
+                  backgroundImage: `url("${track.poster}")`,
+                  backgroundSize: "cover"
+                }}
+                className={`size-11 shrink-0 rounded-xl`} />
               <div className="min-w-0">
                 <p className="truncate font-semibold text-white">{track.title}</p>
-                <p className="truncate text-xs text-white/45">{album.artist}</p>
+                <p className="truncate text-xs text-white/45">{album.artist ?? track.artist}</p>
               </div>
             </div>
             <div className="hidden items-center text-white/55 md:flex">{album.title}</div>

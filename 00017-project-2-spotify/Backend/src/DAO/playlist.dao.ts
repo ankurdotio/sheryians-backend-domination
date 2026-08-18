@@ -7,15 +7,15 @@ import type { PlaylistDocument, CreatePlaylistRequest } from "../types/playlist.
  * @param input - The input data for creating the playlist.
  * @returns The created playlist document.
  */
-export async function createPlaylist(input: CreatePlaylistRequest): Promise<PlaylistDocument> { 
+export async function createPlaylist(input: CreatePlaylistRequest): Promise<PlaylistDocument> {
 
-    const playlist  = await Playlist.create({
+    const playlist = await Playlist.create({
         user: input.user,
         title: input.title,
         songs: input.songs
     })
 
-    return playlist
+    return playlist.toObject()
 }
 
 /**
@@ -34,7 +34,7 @@ export async function addSongToPlaylist(playlistId: string, songId: string): Pro
  * @returns An array of playlist documents belonging to the specified user.
  */
 export async function getPlaylistsByUserId(userId: string): Promise<PlaylistDocument[]> {
-    const playlists = await Playlist.find({ user: userId });
+    const playlists = await Playlist.find({ user: userId }).populate("user")
     return playlists
 }
 
@@ -63,5 +63,29 @@ export async function getPlaylistByIdAndUserId(playlistId: string, userId: strin
     const playlist = await Playlist.findOne({ _id: playlistId, user: userId })
 
     return playlist
-    
+
+}
+
+/**
+ * Retrieves a playlist document by its ID and populates the songs with their details.
+ * @param playlistId - The ID of the playlist to be retrieved.
+ * @param userId - The ID of the user associated with the playlist.
+ * @returns The playlist document with populated song details if found, otherwise null.
+ */
+export async function getPlaylistDetailsById(playlistId: string, userId: string): Promise<PlaylistDocument | null> {
+
+    const playlist = await Playlist.findOne({ _id: playlistId, user: userId }).populate("songs").populate({
+        path: "songs",
+        populate: [
+            {
+                path: "artist",
+            },
+            {
+                path: "album"
+            }
+        ]
+    });
+
+    return playlist
+
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { uploadFile } from "../services/storage.service.js"
 import { createAlbum, getAlbumByIdAndArtistId, getSampleAlbums, getAlbumById } from "../DAO/album.dao.js"
-import { addSongToPlaylist, createPlaylist, getPlaylistById, getPlaylistsByUserId, getPlaylistByIdAndUserId } from "../DAO/playlist.dao.js"
+import { addSongToPlaylist, createPlaylist, getPlaylistById, getPlaylistsByUserId, getPlaylistByIdAndUserId,getPlaylistDetailsById } from "../DAO/playlist.dao.js"
 import { createSong, getSampleSongs, getSongById } from "../DAO/song.dao.js"
 import id3 from "node-id3";
 
@@ -170,7 +170,11 @@ export const createPlaylistController = async (req: Request, res: Response) => {
     return res.status(201).json({
         message: "Playlist created successfully.",
         data: {
-            playlist
+            playlist: {
+                ...playlist,
+                user: req.user
+            }
+
         }
     });
 
@@ -209,4 +213,47 @@ export const addSongToPlaylistController = async (req: Request, res: Response) =
             songId: song._id
         }
     });
+}
+
+
+/**
+ * Controller to get all playlists of the authenticated user.
+ */
+export const getPlaylistsController = async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const playlists = await getPlaylistsByUserId(user!.id);
+
+    return res.status(200).json({
+        message: "Playlists retrieved successfully.",
+        data: {
+            playlists
+        }
+    });
+}
+
+/**
+ * Controller to get a specific playlist by its ID for the authenticated user.
+ */
+export const getPlaylistsByIdController = async (req: Request, res: Response) => {
+
+    const { playlistId } = req.params;
+
+    if (!playlistId) {
+        return res.status(400).json({ message: "Playlist ID is required." });
+    }
+
+    const playlistDetails = await getPlaylistDetailsById(typeof playlistId === "string" ? playlistId : playlistId[0], req.user!.id);
+    
+    if (!playlistDetails) {
+        return res.status(404).json({ message: "Playlist not found or you do not have permission to view this playlist." });
+    }
+
+    return res.status(200).json({
+        message: "Playlist retrieved successfully.",
+        data: {
+            playlist: playlistDetails
+        }
+    });
+    
 }
