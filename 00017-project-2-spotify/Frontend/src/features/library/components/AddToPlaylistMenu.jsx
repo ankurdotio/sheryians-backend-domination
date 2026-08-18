@@ -44,7 +44,7 @@ function AddToPlaylistMenu({ track }) {
     <div className="relative" ref={containerRef}>
       <button
         aria-label="Add to playlist"
-        className="grid size-8 place-items-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white"
+        className="grid size-8 place-items-center rounded-full bg-black/45 text-white/70 backdrop-blur transition hover:bg-black/70 hover:text-white"
         onClick={handleToggle}
         type="button"
       >

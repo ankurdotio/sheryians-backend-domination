@@ -18,7 +18,7 @@ function Layout() {
     register,
   } = useUser()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const { playlists } = useLibraryData()
+  const { playlists, createPlaylist, createStatus, createError } = useLibraryData()
   const { currentTrack, isPlaying, progress, volume, togglePlay, nextTrack, previousTrack, setProgress, setVolume } =
     usePlayerControls()
 
@@ -38,7 +38,12 @@ function Layout() {
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(29,185,84,0.16),_transparent_24%),radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_18%),linear-gradient(180deg,_#090909_0%,_#040404_100%)] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.06),_transparent_35%)]" />
       <div className="relative z-10 flex min-h-screen flex-col lg:flex-row">
-        <Sidebar playlists={playlists} />
+        <Sidebar
+          createError={createError}
+          createStatus={createStatus}
+          onCreatePlaylist={createPlaylist}
+          playlists={playlists}
+        />
         <div className="flex min-w-0 flex-1 flex-col lg:pl-72">
           <Navbar
             isAuthenticated={isAuthenticated}

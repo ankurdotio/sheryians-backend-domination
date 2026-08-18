@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 
-function MediaCard({ item, to, subtitle, compact = false, onClick }) {
+function MediaCard({ item, to, subtitle, compact = false, onClick, action }) {
   const content = (
     <article className="group flex h-full flex-col gap-3 rounded-[24px] border border-white/10 bg-white/5 p-4 transition duration-200 hover:-translate-y-1 hover:border-white/20 hover:bg-white/8 hover:shadow-2xl hover:shadow-black/35">
       <div
@@ -26,21 +26,36 @@ function MediaCard({ item, to, subtitle, compact = false, onClick }) {
 
   if (to) {
     return (
-      <Link className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" to={to}>
-        {content}
-      </Link>
+      <div className="relative h-full">
+        <Link className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" to={to}>
+          {content}
+        </Link>
+        {action ? <div className="absolute right-6 top-6 z-20">{action}</div> : null}
+      </div>
     )
   }
 
   if (onClick) {
     return (
-      <button
-        className="block h-full w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-        onClick={onClick}
-        type="button"
-      >
+      <div className="relative h-full">
+        <button
+          className="block h-full w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+          onClick={onClick}
+          type="button"
+        >
+          {content}
+        </button>
+        {action ? <div className="absolute right-6 top-6 z-20">{action}</div> : null}
+      </div>
+    )
+  }
+
+  if (action) {
+    return (
+      <div className="relative h-full">
         {content}
-      </button>
+        <div className="absolute right-6 top-6 z-20">{action}</div>
+      </div>
     )
   }
 

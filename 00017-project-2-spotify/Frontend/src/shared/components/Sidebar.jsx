@@ -1,12 +1,21 @@
+import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import Icon from './Icon.jsx'
+import CreatePlaylistModal from '../../features/library/components/CreatePlaylistModal.jsx'
 
 const navItems = [
   { to: '/', label: 'Home', icon: 'home' },
   { to: '/library', label: 'Your Library', icon: 'library' },
 ]
 
-function Sidebar({ playlists = [] }) {
+function Sidebar({ playlists = [], onCreatePlaylist, createStatus, createError }) {
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+
+  const handleCreate = async (title) => {
+    await onCreatePlaylist(title)
+    setIsCreateOpen(false)
+  }
+
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden h-screen w-72 shrink-0 border-r border-white/10 bg-zinc-950/85 px-4 py-5 backdrop-blur-2xl lg:flex lg:flex-col">
       <Link className="flex items-center gap-3 px-2 text-white" to="/">
@@ -44,7 +53,14 @@ function Sidebar({ playlists = [] }) {
 
       <div className="mt-8 flex items-center justify-between px-2 text-xs uppercase tracking-[0.3em] text-white/35">
         <span>Playlists</span>
-        <Icon className="size-4 text-white/35" name="plus" />
+        <button
+          aria-label="Create playlist"
+          className="rounded-full p-1 text-white/35 transition hover:bg-white/10 hover:text-white"
+          onClick={() => setIsCreateOpen(true)}
+          type="button"
+        >
+          <Icon className="size-4" name="plus" />
+        </button>
       </div>
 
       <div className="mt-3 flex-1 space-y-1 overflow-y-auto pr-1">
@@ -62,6 +78,14 @@ function Sidebar({ playlists = [] }) {
           </Link>
         ))}
       </div>
+
+      <CreatePlaylistModal
+        error={createError}
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onCreate={handleCreate}
+        status={createStatus}
+      />
     </aside>
   )
 }

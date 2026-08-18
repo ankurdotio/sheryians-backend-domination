@@ -18,7 +18,7 @@ function AlbumPage() {
   return (
     <div className="space-y-6 pb-8">
       <AlbumHeader album={album} />
-      <TrackList tracks={album.tracks} />
+      <TrackList tracks={album.tracks} album={album} />
     </div>
   )
 }

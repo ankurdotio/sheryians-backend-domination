@@ -1,28 +1,25 @@
-import { findAlbumById, findTrackById } from '../../../shared/utils/mockData.js'
-import { wait } from '../../../shared/utils/mockAsync.js'
+import { api } from '../../../shared/api/httpClient.js'
 
 export const getAlbumById = async (albumId) => {
-    const album = findAlbumById(albumId)
+    const albumResponse = await api.get(`/songs/album/${albumId}`)
 
-    if (!album) {
-        return wait(null)
+    const album = {
+        id: albumResponse.data.data.album._id,
+        title: albumResponse.data.data.album.title,
+        poster: albumResponse.data.data.album.poster,
+        artist: albumResponse.data.data.album.artist,
+        tracks: albumResponse.data.data.album.tracks,
     }
 
-    return wait({
+    return {
         ...album,
-        tracks: album.trackIds
-            .map((trackId, index) => {
-                const track = findTrackById(trackId)
-
-                if (!track) {
-                    return null
-                }
-
+        tracks: album.tracks
+            .map((track, index) => {
                 return {
                     ...track,
                     trackNumber: index + 1,
                 }
             })
             .filter(Boolean),
-    })
+    }
 }

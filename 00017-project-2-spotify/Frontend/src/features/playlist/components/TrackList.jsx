@@ -4,7 +4,7 @@ import { formatDuration, formatNumber } from '../../../shared/utils/format.js'
 import { playTrack } from '../../player/state/playerSlice.js'
 import AddToPlaylistMenu from '../../library/components/AddToPlaylistMenu.jsx'
 
-function TrackList({ tracks }) {
+function TrackList({ tracks, album }) {
   const dispatch = useDispatch()
 
   return (
@@ -35,13 +35,18 @@ function TrackList({ tracks }) {
           >
             <div className="flex items-center text-white/40">{track.trackNumber}</div>
             <div className="flex min-w-0 items-center gap-3">
-              <div className={`size-11 shrink-0 rounded-xl bg-gradient-to-br ${track.coverClass}`} />
+              <div 
+              style={{
+                backgroundImage: `url("${track.poster}")`,
+                backgroundSize: "cover"
+              }}
+              className={`size-11 shrink-0 rounded-xl`} />
               <div className="min-w-0">
                 <p className="truncate font-semibold text-white">{track.title}</p>
-                <p className="truncate text-xs text-white/45">{track.artist}</p>
+                <p className="truncate text-xs text-white/45">{album.artist}</p>
               </div>
             </div>
-            <div className="hidden items-center text-white/55 md:flex">{track.album}</div>
+            <div className="hidden items-center text-white/55 md:flex">{album.title}</div>
             <div className="flex items-center justify-end gap-3 text-white/55">
               <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-xs uppercase tracking-[0.2em] text-white/35">
                 <Icon className="size-3" name="heart" />

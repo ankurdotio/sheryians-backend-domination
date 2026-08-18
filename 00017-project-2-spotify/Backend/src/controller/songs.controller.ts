@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { uploadFile } from "../services/storage.service.js"
-import { createAlbum, getAlbumByIdAndArtistId } from "../DAO/album.dao.js"
+import { createAlbum, getAlbumByIdAndArtistId, getSampleAlbums, getAlbumById } from "../DAO/album.dao.js"
 import { addSongToPlaylist, createPlaylist, getPlaylistById, getPlaylistsByUserId, getPlaylistByIdAndUserId } from "../DAO/playlist.dao.js"
 import { createSong, getSampleSongs, getSongById } from "../DAO/song.dao.js"
 import id3 from "node-id3";
@@ -53,12 +53,12 @@ export const uploadSongController = async (req: Request, res: Response) => {
 
 
 /**
- * Controller to get 20 sample songs from the database.
+ * Controller to get 20 or n number max (20) sample songs from the database.
  */
 export const getSampleSongsController = async (req: Request, res: Response) => {
 
     const numberOfSongs = req.query.n ?? 20;
-    
+
     const songs = await getSampleSongs(Number(numberOfSongs));
 
     res.status(200).json({
@@ -102,6 +102,53 @@ export const createAlbumController = async (req: Request, res: Response) => {
 
 }
 
+/**
+ * Controller to get 20 or n number (max 20) sample albums from the database.
+ */
+export const getSampleAlbumController = async (req: Request, res: Response) => {
+    const numberOfAlbums = req.query.n ?? 20;
+
+    const albums = await getSampleAlbums(Number(numberOfAlbums));
+
+    return res.status(200).json({
+        message: "Sample albums retrieved successfully.",
+        data: {
+            albums: albums.map(album => ({
+                _id: album._id,
+                title: album.title,
+                poster: album.poster,
+                artist: album.artist
+            }))
+        }
+    })
+}
+
+
+/**
+ * Controller to get an album by its ID. It retrieves the album document from the database and returns it in the response.
+ */
+export const getAlbumByIdController = async (req: Request, res: Response) => {
+
+    const { albumId } = req.params;
+
+    if (!albumId) {
+        return res.status(400).json({ message: "Album ID is required." });
+    }
+
+    const album = await getAlbumById(typeof albumId === "string" ? albumId : albumId[0]);
+
+    if (!album) {
+        return res.status(404).json({ message: "Album not found." });
+    }
+
+    return res.status(200).json({
+        message: "Album retrieved successfully.",
+        data: {
+            album
+        }
+    });
+
+}
 
 /**
  * Controller to handle the creation of new playlist. It creates a new playlist document in the database.

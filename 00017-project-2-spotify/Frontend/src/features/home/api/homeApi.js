@@ -17,11 +17,22 @@ export const getHomeData = async () => {
         }
     })
 
+    const albumsResponse = await api.get("/songs/album?n=4")
 
-    return wait({
+    const albums = albumsResponse.data.data.albums.map(album => {
+        return {
+            id: album._id,
+            title: album.title,
+            artist: album.artist,
+            poster: album.poster,
+        }
+    })
+
+
+    return {
         greeting: 'Good evening',
         subtitle: 'Jump back into your mock listening queue.',
-        ...mockHomeShelves,
         songs: songs,
-    })
+        albums: albums,
+    }
 }

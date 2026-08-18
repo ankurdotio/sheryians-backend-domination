@@ -1,5 +1,13 @@
 import { Router } from "express";
-import { uploadSongController, createAlbumController, createPlaylistController, getSampleSongsController, addSongToPlaylistController } from "../controller/songs.controller.js";
+import {
+    uploadSongController,
+    createAlbumController,
+    createPlaylistController,
+    getSampleSongsController,
+    addSongToPlaylistController,
+    getSampleAlbumController,
+    getAlbumByIdController
+} from "../controller/songs.controller.js";
 import { authMiddleware, protectedToArtistMiddleware } from "../middlewares/auth.middleware.js";
 import multer from "multer";
 
@@ -31,6 +39,17 @@ function registerSongsRoutes(): Router {
     router.post("/album", authMiddleware, protectedToArtistMiddleware, upload.single("poster"), createAlbumController);
 
 
+    /**
+     * @route GET /api/songs/album
+     */
+    router.get('/album', authMiddleware, getSampleAlbumController)
+
+    /**
+     * @route GET /api/songs/album/:albumId
+     */
+    router.get('/album/:albumId', authMiddleware, getAlbumByIdController)
+
+    
     /**
      * @route POST /api/songs/playlist
      */

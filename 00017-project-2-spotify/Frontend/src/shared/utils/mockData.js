@@ -258,3 +258,30 @@ export const addTrackToPlaylist = (playlistId, trackId) => {
     playlist.tracks.push(trackId)
     return true
 }
+
+const newPlaylistCoverClasses = [
+    'from-emerald-500 via-teal-400 to-cyan-500',
+    'from-fuchsia-500 via-rose-500 to-orange-400',
+    'from-sky-500 via-indigo-500 to-violet-600',
+    'from-amber-400 via-orange-500 to-rose-500',
+]
+
+// UI-only: mutates the in-memory mocks so a created playlist shows up while the app stays open.
+export const createPlaylist = (title) => {
+    const cleanTitle = title.trim()
+    const playlist = {
+        id: `playlist-${Date.now()}`,
+        title: cleanTitle,
+        description: 'Playlist created from the sidebar.',
+        owner: 'You',
+        followers: 0,
+        tracks: [],
+        coverClass: newPlaylistCoverClasses[ mockPlaylists.length % newPlaylistCoverClasses.length ],
+        type: 'Playlist',
+    }
+
+    mockPlaylists.push(playlist)
+    mockLibraryPlaylists.unshift({ ...playlist, savedAt: 'Saved just now' })
+
+    return playlist
+}

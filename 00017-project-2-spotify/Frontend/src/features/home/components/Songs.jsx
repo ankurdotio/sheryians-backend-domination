@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux'
 import MediaCard from '../../../shared/components/MediaCard.jsx'
+import AddToPlaylistMenu from '../../library/components/AddToPlaylistMenu.jsx'
 import { playTrack } from '../../player/state/playerSlice.js'
 
 function Songs({ items }) {
@@ -15,6 +16,7 @@ function Songs({ items }) {
         {items.map((track) => (
           <MediaCard
             key={track.id}
+            action={<AddToPlaylistMenu track={track} />}
             compact
             item={track}
             subtitle={`${track.artist} • ${track.album}`}
