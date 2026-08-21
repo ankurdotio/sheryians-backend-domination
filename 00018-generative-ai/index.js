@@ -1,16 +1,31 @@
 import dotenv from "dotenv";
-dotenv.config();
-
+import readline from "readline/promises";
 import { ChatMistralAI } from "@langchain/mistralai"
 
+dotenv.config();
+
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
 
 const model = new ChatMistralAI({
     model: "mistral-medium-latest",
     apiKey: process.env.MISTRAL_API_KEY
 })
 
-const stream = await model.stream("write an essay on INDIA ")
 
-for await (const chunk of stream) {
-    process.stdout.write(chunk.content)
+while (true) {
+
+    const userInput = await rl.question("You: ");
+
+    const response = await model.invoke(userInput);
+
+    console.log("MistralAI: ", response.content);
 }
+
+
+
+
+rl.close();
