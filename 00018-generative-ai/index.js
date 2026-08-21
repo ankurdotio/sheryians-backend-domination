@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import readline from "readline/promises";
 import { ChatMistralAI } from "@langchain/mistralai"
+import { HumanMessage, AIMessage } from "langchain"
 
 dotenv.config();
 
@@ -15,14 +16,30 @@ const model = new ChatMistralAI({
     apiKey: process.env.MISTRAL_API_KEY
 })
 
+const messages = []
 
 while (true) {
 
     const userInput = await rl.question("You: ");
 
-    const response = await model.invoke(userInput);
+    if (userInput.toLocaleLowerCase() === "exit") {
+        break;
+    }
 
-    console.log("MistralAI: ", response.content);
+    messages.push(new HumanMessage(userInput));
+
+    const stream = await model.stream(messages);
+
+    let aiResponse = ""
+
+    for await (const chunk of stream) {
+        aiResponse += chunk.text;
+        process.stdout.write(chunk.text);
+    }
+
+    process.stdout.write("\n");
+
+    messages.push(new AIMessage(aiResponse));
 }
 
 
