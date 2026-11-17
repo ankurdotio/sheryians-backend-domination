@@ -23,8 +23,19 @@ app.get("/api/health", (req, res) => {
 app.use(express.static(path.join(path.resolve(), "public")))
 
 app.get("/", (req, res) => {
-    res.render("index")
+    res.render("index", {
+        data: "<h1>Hello World</h1>"
+    })
 })
+
+
+
+/**
+ * <%=  %>
+ * <% %>
+ * <%# %>
+ * <%- %>
+ */
 
 
 export default app
