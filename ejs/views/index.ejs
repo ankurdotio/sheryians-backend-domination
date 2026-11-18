@@ -11,9 +11,33 @@
         rel="stylesheet"
         href="index.css"
     >
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
+        rel="stylesheet"
+    />
 </head>
 <body>
-   <%= data %>
+    <nav>
+        <h1>Notes</h1>
+        <a href="/create">Create Note</a>
+    </nav>
+
+    <% if(notes.length == 0){ %>
+    <p>No notes available</p>
+    <% } else { %>
+    <div class="notes">
+        <% notes.map((note,index)=>{ %>
+
+        <div class="note">
+            <h2><%= note.title %></h2>
+            <p><%= note.content %></p>
+            <a href="/notes/delete/<%= index %>"><i class="ri-delete-bin-7-line"></i></a>
+        </div>
+
+        <% })%>
+    </div>
+
+    <% }%>
     <script src="script.js"></script>
 </body>
 </html>
